@@ -4,7 +4,6 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
-    Vector2 velocity = new Vector2(10f, 0f);
 
     bool isAnchorable = false;
     Vector3 anchor;
@@ -15,7 +14,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         spring = GetComponent<SpringJoint2D>();
-        rb.velocity = velocity;
+        rb.velocity = new Vector2(10f, 0f);
         anchor = transform.position;
     }
 
@@ -31,11 +30,22 @@ public class PlayerController : MonoBehaviour
         //Debug.DrawLine(vel, transform.position, Color.blue);
         //rb.velocity.Set(transform.right.x * 10f, transform.right.y);
 
-        if (anchored)
+        if (isAnchorable)
         {
             Debug.DrawLine(anchor, pos, Color.red);
-
             if (Input.GetKey("space"))
+            {
+                spring.enabled = true;
+                anchored = true;
+                isAnchorable = false;
+            }
+        }
+
+        if (anchored)
+        {
+            Debug.DrawLine(anchor, pos, Color.blue);
+
+            if (!Input.GetKey("space"))
             {
                 spring.enabled = false;
                 anchored = false;
@@ -51,12 +61,9 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log("enter");
-        anchored = true;
+        isAnchorable = true;
         anchor = other.transform.position;
-        Debug.Log(anchor.ToString());
 
-        spring.enabled = true;
         spring.connectedAnchor = new Vector2(anchor.x, anchor.y);
     }
 
@@ -67,6 +74,6 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        //Debug.Log("exit");
+        isAnchorable = false;
     }
 }
