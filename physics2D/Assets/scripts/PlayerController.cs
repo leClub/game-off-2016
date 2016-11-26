@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            cameraTargetPos = new Vector3(pos.x, pos.y, -10);
+            cameraTargetPos = new Vector3(pos.x, pos.y, -10) + new Vector3(rb.velocity.x, rb.velocity.y, 0f);
         }
 
         // constant velocity
@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
         rb.velocity = Vector3.ClampMagnitude(rb.velocity * 9999, 15);
         Debug.DrawLine(vel, transform.position, Color.cyan);
 
-        mainCamera.transform.position = Vector3.SmoothDamp(mainCamera.transform.position, cameraTargetPos + new Vector3(rb.velocity.x, rb.velocity.y, 0f), ref refref, 0.4f);
+        mainCamera.transform.position = Vector3.SmoothDamp(mainCamera.transform.position, cameraTargetPos, ref refref, 0.4f);
     }
 
     void OnTriggerEnter2D(Collider2D other)
