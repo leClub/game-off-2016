@@ -33,7 +33,6 @@ public class PlayerController : MonoBehaviour
 
         if (isAnchorable)
         {
-            //Debug.DrawLine(anchor, pos, Color.red);
             if (Input.GetKey("space"))
             {
                 spring.enabled = true;
@@ -44,8 +43,7 @@ public class PlayerController : MonoBehaviour
 
         if (anchored)
         {
-            //Debug.DrawLine(anchor, pos, Color.blue);
-
+    
             if (!Input.GetKey("space"))
             {
                 spring.enabled = false;
@@ -69,7 +67,7 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log("enter");
+        Debug.Log("enter");
         anchored = true;
         anchor = other.transform.position;
 
