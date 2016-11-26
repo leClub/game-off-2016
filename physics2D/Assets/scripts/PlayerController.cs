@@ -16,7 +16,6 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         spring = GetComponent<SpringJoint2D>();
         rb.velocity = new Vector2(10f, 0f);
-        anchor = transform.position;
     }
 
     void Update()
@@ -43,7 +42,12 @@ public class PlayerController : MonoBehaviour
 
         if (anchored)
         {
-    
+            float rotationAngle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) - Mathf.PI / 2;
+            float x = anchor.x + Mathf.Cos(rotationAngle) * 5;
+            float y = anchor.y + Mathf.Sin(rotationAngle) * 5;
+            Debug.DrawLine(anchor, new Vector3(x, y, 0), Color.yellow);
+            transform.rotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * rotationAngle);
+
             if (!Input.GetKey("space"))
             {
                 spring.enabled = false;
@@ -51,17 +55,9 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        // constant velocity
         Vector3 vel = transform.position + new Vector3(rb.velocity.x, rb.velocity.y, 0);
         rb.velocity = Vector3.ClampMagnitude(rb.velocity * 9999, 15);
-
-        //transform.rotation = new Quaternion(rb.velocity.x, rb.velocity.y, 0f, 0f);
-
-        float rotationAngle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) - Mathf.PI / 2;
-        float x = anchor.x + Mathf.Cos(rotationAngle)*5;
-        float y = anchor.y + Mathf.Sin(rotationAngle)*5;
-        Debug.DrawLine(anchor, new Vector3(x, y, 0), Color.yellow);
-        transform.rotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * rotationAngle);
-
         Debug.DrawLine(vel, transform.position, Color.cyan);
     }
 
@@ -79,12 +75,12 @@ public class PlayerController : MonoBehaviour
         Vector2 A = new Vector2(anchor.x - dir.y, anchor.y + dir.x);
         Vector2 B = new Vector2(anchor.x + dir.y, anchor.y - dir.x);
 
-        Debug.DrawLine(anchor, A, Color.green, 100);
-        Debug.DrawLine(anchor, B, Color.red, 100);
+        //Debug.DrawLine(anchor, A, Color.green, 100);
+        //Debug.DrawLine(anchor, B, Color.red, 100);
 
-        Debug.DrawLine(pos, A, Color.yellow, 100);
-        Debug.DrawLine(pos, B, Color.yellow, 100);
-        Debug.DrawLine(pos, anchor, Color.yellow, 100);
+        //Debug.DrawLine(pos, A, Color.yellow, 100);
+        //Debug.DrawLine(pos, B, Color.yellow, 100);
+        //Debug.DrawLine(pos, anchor, Color.yellow, 100);
 
         float velAngle = Mathf.Atan2(rb.velocity.y, rb.velocity.x);
         Vector2 posA = A - pos;
@@ -98,6 +94,7 @@ public class PlayerController : MonoBehaviour
         if (Mathf.Min(dif) == Mathf.Abs(velAngle - posAnchorAngle))
         {
             Debug.Log("crash");
+            rb.velocity = Vector3.zero;
         }
         else
         {
