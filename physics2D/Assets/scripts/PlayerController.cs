@@ -4,12 +4,13 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
-    SpringJoint2D spring;
-    Vector3 anchor;
-    bool anchored = false;
     Vector2 velocity = new Vector2(10f, 0f);
 
-    // Use this for initialization
+    bool isAnchorable = false;
+    Vector3 anchor;
+    bool anchored = false;
+    SpringJoint2D spring;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -25,8 +26,6 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 pos = transform.position;
-        Debug.DrawLine(pos, pos + transform.up, Color.blue);
-        Debug.DrawLine(pos, pos + transform.right, Color.red);
 
         //Vector2 vel = rb.velocity + new Vector2(pos.x, pos.y);
         //Debug.DrawLine(vel, transform.position, Color.blue);
