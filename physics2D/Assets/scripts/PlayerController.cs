@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D rb;
 
     bool isAnchorable = false;
-    Vector3 anchor;
+    Vector2 anchor;
     bool anchored = false;
     SpringJoint2D spring;
 
@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
 
         if (isAnchorable)
         {
-            Debug.DrawLine(anchor, pos, Color.red);
+            //Debug.DrawLine(anchor, pos, Color.red);
             if (Input.GetKey("space"))
             {
                 spring.enabled = true;
@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
 
         if (anchored)
         {
-            Debug.DrawLine(anchor, pos, Color.blue);
+            //Debug.DrawLine(anchor, pos, Color.blue);
 
             if (!Input.GetKey("space"))
             {
@@ -55,16 +55,46 @@ public class PlayerController : MonoBehaviour
         Vector3 vel = transform.position + new Vector3(rb.velocity.x, rb.velocity.y, 0);
         rb.velocity = Vector3.ClampMagnitude(rb.velocity * 9999, 10);
 
-        Debug.DrawLine(vel, transform.position, Color.cyan);
-        Debug.Log(rb.velocity);
+        //Debug.DrawLine(vel, transform.position, Color.cyan);
+        //Debug.Log(rb.velocity);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        isAnchorable = true;
-        anchor = other.transform.position;
+        anchor = new Vector2(other.transform.position.x, other.transform.position.y);
 
         spring.connectedAnchor = new Vector2(anchor.x, anchor.y);
+
+        Vector2 pos = new Vector2(transform.position.x, transform.position.y);
+        Vector2 dir = anchor - pos;
+        dir.Normalize();
+        Vector2 A = new Vector2(anchor.x - dir.y, anchor.y + dir.x);
+        Vector2 B = new Vector2(anchor.x + dir.y, anchor.y - dir.x);
+
+        Debug.DrawLine(anchor, A, Color.green, 100);
+        Debug.DrawLine(anchor, B, Color.red, 100);
+
+        Debug.DrawLine(pos, A, Color.yellow, 100);
+        Debug.DrawLine(pos, B, Color.yellow, 100);
+        Debug.DrawLine(pos, anchor, Color.yellow, 100);
+
+        float velAngle = Mathf.Atan2(rb.velocity.y, rb.velocity.x);
+        Vector2 posA = A - pos;
+        float posAAngle = Mathf.Atan2(posA.y, posA.x);
+        Vector2 posB = B - pos;
+        float posBAngle = Mathf.Atan2(posB.y, posB.x);
+        Vector2 posAnchor = anchor - pos;
+        float posAnchorAngle = Mathf.Atan2(posAnchor.y, posAnchor.x);
+
+        float[] dif = new float[] { Mathf.Abs(velAngle - posAAngle), Mathf.Abs(velAngle - posBAngle), Mathf.Abs(velAngle - posAnchorAngle) };
+        if (Mathf.Min(dif) == Mathf.Abs(velAngle - posAnchorAngle))
+        {
+            Debug.Log("crash");
+        }
+        else
+        {
+            isAnchorable = true;
+        }
     }
 
     void OnTriggerStay2D(Collider2D other)
