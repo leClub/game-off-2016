@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 refref = Vector3.zero;
 
+    // Animation
+    Animator anim;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -27,6 +30,8 @@ public class PlayerController : MonoBehaviour
 
         // Set camera default position
         cameraTargetPos = transform.position;
+
+        anim = GetComponent<Animator>();
     }
 
     void Update()
@@ -80,7 +85,7 @@ public class PlayerController : MonoBehaviour
 
         // constant velocity
         Vector3 vel = transform.position + new Vector3(rb.velocity.x, rb.velocity.y, 0);
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity * 9999, maxSpeed);
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity * 999, maxSpeed);
         Debug.DrawLine(vel, transform.position, Color.cyan);
 
         mainCamera.transform.position = Vector3.SmoothDamp(mainCamera.transform.position, cameraTargetPos, ref refref, 0.4f);
@@ -130,6 +135,9 @@ public class PlayerController : MonoBehaviour
         else if ( other.tag == "Planet" )
         {
             rb.velocity = Vector3.zero;
+            anim.enabled = true;
+            anim.SetBool( "explode", true);
+            transform.localScale = new Vector3(4f, 4f, 1f);
             Debug.Log("BADABOOM !");
         }
         // Collision behaviour when hit other objects
