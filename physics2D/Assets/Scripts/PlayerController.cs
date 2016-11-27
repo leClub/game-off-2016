@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     // Camera
     public Camera mainCamera;
     Vector3 cameraTargetPos;
+    float cameraTargetSize;
 
     // Rigidbody
     Rigidbody2D rb;
@@ -30,6 +32,7 @@ public class PlayerController : MonoBehaviour
 
         // Set camera default position
         cameraTargetPos = transform.position;
+        cameraTargetSize = 50f;
 
         anim = GetComponent<Animator>();
     }
@@ -59,7 +62,8 @@ public class PlayerController : MonoBehaviour
         if (anchored)
         {
             // Set camera target position to planet
-            cameraTargetPos = new Vector3(anchor.x, anchor.y, -10);
+            cameraTargetPos = new Vector3(anchor.x, anchor.y, -10f);
+            cameraTargetSize = 12f;
 
             // Set rotation around planet of ship
             float rotationAngle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) - Mathf.PI / 2;
@@ -80,15 +84,17 @@ public class PlayerController : MonoBehaviour
         else
         {
             // Set camera target position to the ship
-            cameraTargetPos = new Vector3(pos.x, pos.y, -10) + new Vector3(rb.velocity.x, rb.velocity.y, 0f);
+            cameraTargetPos = new Vector3(pos.x, pos.y, -10f) + new Vector3(rb.velocity.x, rb.velocity.y, 0f);
+            cameraTargetSize = 20f;
         }
 
         // constant velocity
         Vector3 vel = transform.position + new Vector3(rb.velocity.x, rb.velocity.y, 0);
         rb.velocity = Vector3.ClampMagnitude(rb.velocity * 999, maxSpeed);
-        Debug.DrawLine(vel, transform.position, Color.cyan);
+        //Debug.DrawLine(vel, transform.position, Color.cyan);
 
         mainCamera.transform.position = Vector3.SmoothDamp(mainCamera.transform.position, cameraTargetPos, ref refref, 0.4f);
+        mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, cameraTargetSize, 0.03f);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -139,6 +145,7 @@ public class PlayerController : MonoBehaviour
             anim.SetBool( "explode", true);
             transform.localScale = new Vector3(4f, 4f, 1f);
             Debug.Log("BADABOOM !");
+            StartCoroutine(ToGameover());
         }
         // Collision behaviour when hit other objects
         else {
@@ -154,5 +161,10 @@ public class PlayerController : MonoBehaviour
     void OnTriggerExit2D(Collider2D other)
     {
         isAnchorable = false;
+    }
+
+    IEnumerator ToGameover() {
+        yield return new WaitForSeconds(3);
+        SceneManager.LoadScene("Gameover", LoadSceneMode.Single);
     }
 }
