@@ -3,23 +3,29 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
+    // Camera
     public Camera mainCamera;
-    Rigidbody2D rb;
-
-    bool isAnchorable = false;
-    Vector2 anchor;
-    bool anchored = false;
-    SpringJoint2D spring;
     Vector3 cameraTargetPos;
+
+    // Rigidbody
+    Rigidbody2D rb;
+    SpringJoint2D spring;
+    Vector2 anchor;
+    bool isAnchorable = false;
+    bool anchored = false;
+    float anchorDist;
+
+    public float maxSpeed = 15;
 
     private Vector3 refref = Vector3.zero;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        spring = GetComponent<SpringJoint2D>();
         rb.velocity = new Vector2(10f, 0f);
+        spring = GetComponent<SpringJoint2D>();
 
+        // Set camera default position
         cameraTargetPos = transform.position;
     }
 
@@ -31,30 +37,35 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 pos = transform.position;
 
-        //Vector2 vel = rb.velocity + new Vector2(pos.x, pos.y);
-        //Debug.DrawLine(vel, transform.position, Color.blue);
-        //rb.velocity.Set(transform.right.x * 10f, transform.right.y);
-
+        // If ship is inside orbit of planet
         if (isAnchorable)
         {
+            // Attach anchor
             if (Input.GetKey("space"))
             {
                 spring.enabled = true;
                 anchored = true;
                 isAnchorable = false;
+                anchorDist = Vector3.Distance(anchor, pos);
             }
         }
 
+        // If ship is attached to orbit of planet
         if (anchored)
         {
+            // Set camera target position to planet
             cameraTargetPos = new Vector3(anchor.x, anchor.y, -10);
 
+            // Set rotation around planet of ship
             float rotationAngle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) - Mathf.PI / 2;
             float x = anchor.x + Mathf.Cos(rotationAngle) * 5;
             float y = anchor.y + Mathf.Sin(rotationAngle) * 5;
             Debug.DrawLine(anchor, new Vector3(x, y, 0), Color.yellow);
             transform.rotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * rotationAngle);
 
+            spring.distance = Mathf.Lerp(spring.distance, anchorDist, 0.5f);
+
+            // Release anchor
             if (!Input.GetKey("space"))
             {
                 spring.enabled = false;
@@ -63,12 +74,13 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            // Set camera target position to the ship
             cameraTargetPos = new Vector3(pos.x, pos.y, -10) + new Vector3(rb.velocity.x, rb.velocity.y, 0f);
         }
 
         // constant velocity
         Vector3 vel = transform.position + new Vector3(rb.velocity.x, rb.velocity.y, 0);
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity * 9999, 15);
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity * 9999, maxSpeed);
         Debug.DrawLine(vel, transform.position, Color.cyan);
 
         mainCamera.transform.position = Vector3.SmoothDamp(mainCamera.transform.position, cameraTargetPos, ref refref, 0.4f);
@@ -76,6 +88,7 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        // Collision behaviour when hit planet orbit
         if (other.tag == "Orbit") {
             anchored = true;
             anchor = other.transform.position;
@@ -113,13 +126,14 @@ public class PlayerController : MonoBehaviour
                 isAnchorable = true;
             }
         }
+        // Collision behaviour when hit planet core
         else if ( other.tag == "Planet" )
         {
             rb.velocity = Vector3.zero;
             Debug.Log("BADABOOM !");
         }
-        else
-        {
+        // Collision behaviour when hit other objects
+        else {
             Debug.Log("??");
         }
     }
