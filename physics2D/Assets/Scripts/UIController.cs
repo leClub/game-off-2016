@@ -23,4 +23,8 @@ public class UIController : MonoBehaviour {
         Debug.Log("Back home");
         SceneManager.LoadScene("Home", LoadSceneMode.Single);
     }
+
+    public void QuitGame() {
+        Application.Quit();
+    }
 }

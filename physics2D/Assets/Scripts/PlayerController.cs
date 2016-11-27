@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
         {
             // Set camera target position to planet
             cameraTargetPos = new Vector3(anchor.x, anchor.y, -10f);
-            cameraTargetSize = 12f;
+            cameraTargetSize = 12f * anchorDist / 10;
 
             // Set rotation around planet of ship
             float rotationAngle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) - Mathf.PI / 2;
@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviour
     }
 
     IEnumerator ToGameover() {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
         SceneManager.LoadScene("Gameover", LoadSceneMode.Single);
     }
 }
