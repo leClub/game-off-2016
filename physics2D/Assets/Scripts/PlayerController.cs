@@ -89,8 +89,8 @@ public class PlayerController : MonoBehaviour
         }
 
         // constant velocity
-        Vector3 vel = transform.position + new Vector3(rb.velocity.x, rb.velocity.y, 0);
         rb.velocity = Vector3.ClampMagnitude(rb.velocity * 999, maxSpeed);
+        //Vector3 vel = transform.position + new Vector3(rb.velocity.x, rb.velocity.y, 0);
         //Debug.DrawLine(vel, transform.position, Color.cyan);
 
         mainCamera.transform.position = Vector3.SmoothDamp(mainCamera.transform.position, cameraTargetPos, ref refref, 0.4f);
@@ -100,7 +100,8 @@ public class PlayerController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         // Collision behaviour when hit planet orbit
-        if (other.tag == "Orbit") {
+        if (other.tag == "Orbit")
+        {
             anchored = true;
             anchor = other.transform.position;
 
@@ -138,14 +139,20 @@ public class PlayerController : MonoBehaviour
             }
         }
         // Collision behaviour when hit planet core
-        else if ( other.tag == "Planet" )
+        else if (other.tag == "Planet")
         {
             rb.velocity = Vector3.zero;
             anim.enabled = true;
-            anim.SetBool( "explode", true);
+            anim.SetBool("explode", true);
             transform.localScale = new Vector3(4f, 4f, 1f);
             Debug.Log("BADABOOM !");
-            StartCoroutine(ToGameover());
+            StartCoroutine(ToGameover(2));
+        }
+        // Collision behaviour when leaving limits
+       else if (other.tag == "OuterSpace")
+        {
+            Debug.Log("leaving limits");
+            StartCoroutine(ToGameover(1));
         }
         // Collision behaviour when hit other objects
         else {
@@ -160,11 +167,16 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        isAnchorable = false;
+        //Debug.Log("OnTriggerExit2D");
+        if (other.tag == "Orbit")
+        {
+            isAnchorable = false;
+        }
     }
 
-    IEnumerator ToGameover() {
-        yield return new WaitForSeconds(2);
+    IEnumerator ToGameover(int seconds)
+    {
+        yield return new WaitForSeconds(seconds);
         SceneManager.LoadScene("Gameover", LoadSceneMode.Single);
     }
 }
