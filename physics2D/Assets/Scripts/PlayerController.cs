@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
@@ -17,7 +18,16 @@ public class PlayerController : MonoBehaviour
     bool anchored = false;
     float anchorDist;
 
-    public float maxSpeed = 15;
+    // Ship speed
+    public float speed = 18;
+    // Minimum ship speed
+    public float minSpeed = 10;
+    // Maximum ship speed
+    public float maxSpeed = 30;
+    // Speed descrease rate
+    public float decreaseRate = 0.02f;
+    // Speed Slider
+    public Slider speedSlider;
 
     private Vector3 refref = Vector3.zero;
 
@@ -35,10 +45,16 @@ public class PlayerController : MonoBehaviour
         cameraTargetSize = 50f;
 
         anim = GetComponent<Animator>();
+
+        // Set speed slider limits
+        speedSlider.maxValue = maxSpeed;
+        speedSlider.minValue = minSpeed;
     }
 
     void Update()
     {
+        //Debug.Log(speed);
+        speedSlider.value = speed;
     }
 
     void FixedUpdate()
@@ -51,10 +67,25 @@ public class PlayerController : MonoBehaviour
             // Attach anchor
             if (Input.GetKey("space"))
             {
+                // Increase speed at new orbit
+                if(speed < maxSpeed) {
+                    speed += 5;
+                }
+
                 spring.enabled = true;
                 anchored = true;
                 isAnchorable = false;
                 anchorDist = Vector3.Distance(anchor, pos);
+            }
+
+        }
+
+        // When key is hold decrease the speed
+        if (Input.GetKey("space")) {
+            if (speed > minSpeed) {
+                speed -= decreaseRate;
+            } else {
+                speed = minSpeed;
             }
         }
 
@@ -84,12 +115,12 @@ public class PlayerController : MonoBehaviour
         else
         {
             // Set camera target position to the ship
-            cameraTargetPos = new Vector3(pos.x, pos.y, -10f) + new Vector3(rb.velocity.x, rb.velocity.y, 0f);
+            cameraTargetPos = (new Vector3(pos.x, pos.y, -10f) + new Vector3(rb.velocity.x, rb.velocity.y, 0f)) / 2;
             cameraTargetSize = 20f;
         }
 
         // constant velocity
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity * 999, maxSpeed);
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity * 999, speed);
         //Vector3 vel = transform.position + new Vector3(rb.velocity.x, rb.velocity.y, 0);
         //Debug.DrawLine(vel, transform.position, Color.cyan);
 
