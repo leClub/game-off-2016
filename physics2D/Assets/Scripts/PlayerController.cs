@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     bool anchored = false;
     float anchorDist;
 
+    private Vector3 refref = Vector3.zero;
+
     // Ship speed
     public float speed = 18;
     // Minimum ship speed
@@ -26,10 +28,14 @@ public class PlayerController : MonoBehaviour
     public float maxSpeed = 30;
     // Speed descrease rate
     public float decreaseRate = 0.02f;
+    // Spedd is decreasing
+    private bool isDescreasing = false;
     // Speed Slider
     public Slider speedSlider;
-
-    private Vector3 refref = Vector3.zero;
+    // Previous speedSlider for lerp transition
+    private float lastSpeed;
+    // Acceleration Particles system
+    public ParticleSystem boostParticle;
 
     // Animation
     Animator anim;
@@ -53,8 +59,9 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        //Debug.Log(speed);
-        speedSlider.value = speed;
+        //Update speed slider with lerp transition
+        speedSlider.value = Mathf.Lerp(lastSpeed, speed, 0.5f);
+        lastSpeed = speedSlider.value;
     }
 
     void FixedUpdate()
@@ -65,37 +72,23 @@ public class PlayerController : MonoBehaviour
         if (isAnchorable)
         {
             // Attach anchor
-            if (Input.GetKey("space"))
+            if (Input.GetKey("space") || Input.touches.Length > 0)
             {
-                // Increase speed at new orbit
-                if(speed < maxSpeed) {
-                    speed += 5;
-                }
-
                 spring.enabled = true;
                 anchored = true;
                 isAnchorable = false;
                 anchorDist = Vector3.Distance(anchor, pos);
+
+                // Set camera target position to planet
+                cameraTargetPos = new Vector3(anchor.x, anchor.y, -10f);
+                cameraTargetSize = 12f * anchorDist / 10;
             }
 
-        }
-
-        // When key is hold decrease the speed
-        if (Input.GetKey("space")) {
-            if (speed > minSpeed) {
-                speed -= decreaseRate;
-            } else {
-                speed = minSpeed;
-            }
         }
 
         // If ship is attached to orbit of planet
         if (anchored)
         {
-            // Set camera target position to planet
-            cameraTargetPos = new Vector3(anchor.x, anchor.y, -10f);
-            cameraTargetSize = 12f * anchorDist / 10;
-
             // Set rotation around planet of ship
             float rotationAngle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) - Mathf.PI / 2;
             float x = anchor.x + Mathf.Cos(rotationAngle) * 5;
@@ -106,7 +99,7 @@ public class PlayerController : MonoBehaviour
             spring.distance = Mathf.Lerp(spring.distance, anchorDist, 0.5f);
 
             // Release anchor
-            if (!Input.GetKey("space"))
+            if (Input.GetKeyUp("space") || Input.touches.Length <= 0)
             {
                 spring.enabled = false;
                 anchored = false;
@@ -115,7 +108,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             // Set camera target position to the ship
-            cameraTargetPos = (new Vector3(pos.x, pos.y, -10f) + new Vector3(rb.velocity.x, rb.velocity.y, 0f)) / 2;
+            cameraTargetPos = new Vector3(pos.x, pos.y, -10f) + new Vector3(rb.velocity.x / 2, rb.velocity.y / 2, 0f);
             cameraTargetSize = 20f;
         }
 
@@ -133,7 +126,6 @@ public class PlayerController : MonoBehaviour
         // Collision behaviour when hit planet orbit
         if (other.tag == "Orbit")
         {
-            anchored = true;
             anchor = other.transform.position;
 
             spring.connectedAnchor = new Vector2(anchor.x, anchor.y);
@@ -193,7 +185,29 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerStay2D(Collider2D other)
     {
-        // Debug.Log( "stay" );
+        //Debug.Log( "stay" );
+        // When key is hold decrease the speed
+        if (Input.GetKeyDown("space") || Input.touches.Length > 0) {
+            isDescreasing = true;
+        }
+        if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
+            //Debug.Log("release");
+            isDescreasing = false;
+
+            // Increase speed at new orbit
+            if (speed < maxSpeed) {
+                speed += 5;
+                boostParticle.Play();
+            }
+        }
+
+        if(isDescreasing) {
+            if (speed > minSpeed) {
+                speed -= decreaseRate;
+            } else {
+                speed = minSpeed;
+            }
+        }
     }
 
     void OnTriggerExit2D(Collider2D other)
