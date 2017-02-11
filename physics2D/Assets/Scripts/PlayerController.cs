@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     public float maxSpeed = 30;
     // Speed descrease rate
     public float decreaseRate = 0.02f;
-    // Spedd is decreasing
+    // Speed is decreasing
     private bool isDescreasing = false;
     // Speed Slider
     public Slider speedSlider;
@@ -72,7 +72,8 @@ public class PlayerController : MonoBehaviour
         if (isAnchorable)
         {
             // Attach anchor
-            if (Input.GetKey("space") || Input.touches.Length > 0)
+            //if (Input.GetKey("space") || Input.touches.Length > 0)
+            if (Input.GetKey("space"))
             {
                 spring.enabled = true;
                 anchored = true;
@@ -99,8 +100,8 @@ public class PlayerController : MonoBehaviour
             spring.distance = Mathf.Lerp(spring.distance, anchorDist, 0.5f);
 
             // Release anchor
-            if (Input.GetKeyUp("space") || Input.touches.Length <= 0)
-            {
+            //if (Input.GetKeyUp("space") || Input.touches.Length <= 0)
+            if (Input.GetKeyUp("space")) {
                 spring.enabled = false;
                 anchored = false;
             }
@@ -187,10 +188,12 @@ public class PlayerController : MonoBehaviour
     {
         //Debug.Log( "stay" );
         // When key is hold decrease the speed
-        if (Input.GetKeyDown("space") || Input.touches.Length > 0) {
+        //if (Input.GetKeyDown("space") || Input.touches.Length > 0) {
+        if (Input.GetKeyDown("space")) {
             isDescreasing = true;
         }
-        if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
+        //if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
+        if (Input.GetKeyUp("space")) {
             //Debug.Log("release");
             isDescreasing = false;
 
