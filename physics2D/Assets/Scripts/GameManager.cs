@@ -18,8 +18,8 @@ public class GameManager : MonoBehaviour {
 	void FixedUpdate () {
 		Debug.Log (missionResolution);
 		if (missionResolution == "FAIL") {
-			Debug.Log("Back home");
-			SceneManager.LoadScene("Home", LoadSceneMode.Single);
+			Debug.Log("Game over");
+			SceneManager.LoadScene("Gameover", LoadSceneMode.Single);
 		}
 	}
 

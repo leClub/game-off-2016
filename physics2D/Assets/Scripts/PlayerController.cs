@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    // Game manager
+    public GameManager gameManager;
+
     // Camera
     public Camera mainCamera;
     Vector3 cameraTargetPos;
@@ -45,6 +48,8 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(10f, 0f);
         spring = GetComponent<SpringJoint2D>();
+
+        gameManager = mainCamera.GetComponent<GameManager>();
 
         // Set camera default position
         cameraTargetPos = transform.position;
@@ -225,6 +230,6 @@ public class PlayerController : MonoBehaviour
     IEnumerator ToGameover(int seconds)
     {
         yield return new WaitForSeconds(seconds);
-        SceneManager.LoadScene("Gameover", LoadSceneMode.Single);
+        gameManager.MissionResolution = "FAIL";
     }
 }
