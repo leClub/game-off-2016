@@ -39,6 +39,11 @@ public class PlayerController : MonoBehaviour
     private float lastSpeed;
     // Acceleration Particles system
     public ParticleSystem boostParticle;
+	// If player as crashed
+	private bool isCrashed = false; 
+
+	// Cotourines
+	Coroutine winRoutine = null;
 
     // Animation
     Animator anim;
@@ -64,9 +69,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        //Update speed slider with lerp transition
+        // Update speed slider with lerp transition
         speedSlider.value = Mathf.Lerp(lastSpeed, speed, 0.5f);
         lastSpeed = speedSlider.value;
+
+		// Do not redirect to Success scene if the player has crashed
+		if (winRoutine != null && isCrashed == true) {
+			StopCoroutine(winRoutine);
+		}
     }
 
     void FixedUpdate()
@@ -166,6 +176,13 @@ public class PlayerController : MonoBehaviour
             {
                 isAnchorable = true;
             }
+
+			// See if the planet is the target
+			if (other.transform.parent.name == gameManager.targetPlanet.name) {
+				Debug.Log ("WIN");
+				winRoutine = StartCoroutine(ToSuccess(3));
+			}
+
         }
         // Collision behaviour when hit planet core
         else if (other.tag == "Planet")
@@ -175,13 +192,14 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("explode", true);
             transform.localScale = new Vector3(4f, 4f, 1f);
             Debug.Log("BADABOOM !");
-            StartCoroutine(ToGameover(2));
+			isCrashed = true;
+            StartCoroutine(ToGameover(3));
         }
         // Collision behaviour when leaving limits
        else if (other.tag == "OuterSpace")
         {
             Debug.Log("leaving limits");
-            StartCoroutine(ToGameover(1));
+            StartCoroutine(ToGameover(3));
         }
         // Collision behaviour when hit other objects
         else {
@@ -232,4 +250,11 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(seconds);
         gameManager.MissionResolution = "FAIL";
     }
+
+
+	IEnumerator ToSuccess(int seconds)
+	{
+		yield return new WaitForSeconds(seconds);
+		gameManager.MissionResolution = "WIN";
+	}
 }

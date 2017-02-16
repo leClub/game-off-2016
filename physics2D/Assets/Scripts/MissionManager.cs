@@ -5,26 +5,45 @@ using UnityEngine;
 
 public class MissionManager : MonoBehaviour {
 
+
 	GameManager gameManager;
 	public Camera mainCamera;
 
+	// Timer
 	public Text timerText;
-
 	public float maxTimeInSeconds;
-
 	private string timeRemaining;
 	private float timeInSeconds, minutes, seconds;
 
+	// Mission status
 	private string missionStatus;
+
+	// Mission target
+	private GameObject[] targets;
+	private GameObject targetPlanet;
 
 	// Use this for initialization
 	void Start () {
+		gameManager = mainCamera.GetComponent<GameManager>();
+
 		timerText = GameObject.Find("Timer").GetComponent<Text>();	
 		timeInSeconds = maxTimeInSeconds;
 
-		gameManager = mainCamera.GetComponent<GameManager>();
+		chooseTarget ();
+
+		Debug.Log (targetPlanet.name);
 	}
-	
+
+	// Choose the target planet randomly
+	void chooseTarget () {
+		// Choose the planet gameobject
+		targets = GameObject.FindGameObjectsWithTag("Planet");
+		int index = Random.Range (0, targets.Length);
+		targetPlanet = targets[index];
+		// Set the game manager target
+		gameManager.TargetPlanet = targetPlanet;
+	}
+
 	// Update is called once per frame
 	void Update () {
 		DisplayTimer ();
@@ -35,6 +54,7 @@ public class MissionManager : MonoBehaviour {
 		}
 	}
 
+	// Calculate and display the timer
 	private void DisplayTimer () {
 		timeInSeconds -= Time.deltaTime;
 
