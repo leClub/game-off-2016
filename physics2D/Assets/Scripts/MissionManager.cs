@@ -7,7 +7,6 @@ public class MissionManager : MonoBehaviour {
 
 
 	GameManager gameManager;
-	public Camera mainCamera;
 
 	// Timer
 	public Text timerText;
@@ -24,18 +23,16 @@ public class MissionManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		gameManager = mainCamera.GetComponent<GameManager>();
+        gameManager = Camera.main.GetComponent<GameManager>();
 
-		timerText = GameObject.Find("Timer").GetComponent<Text>();	
+        timerText = GameObject.Find("Timer").GetComponent<Text>();	
 		timeInSeconds = maxTimeInSeconds;
 
-		chooseTarget ();
-
-		Debug.Log (targetPlanet.name);
+        pickTarget();
 	}
 
 	// Choose the target planet randomly
-	void chooseTarget () {
+	void pickTarget () {
 		// Choose the planet gameobject
 		targets = GameObject.FindGameObjectsWithTag("Planet");
 		int index = Random.Range (0, targets.Length);

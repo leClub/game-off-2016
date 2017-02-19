@@ -27,9 +27,9 @@ public class GameManager : MonoBehaviour {
 			Debug.Log("YOU WIN");
 			SceneManager.LoadScene("Success", LoadSceneMode.Single);
 		}
-	}
+    }
 
-	public GameObject TargetPlanet {
+    public GameObject TargetPlanet {
 		get {
 			return targetPlanet;
 		}

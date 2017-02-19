@@ -13,6 +13,9 @@ public class PlayerController : MonoBehaviour
     Vector3 cameraTargetPos;
     float cameraTargetSize;
 
+    // Target Arrow
+    public GameObject targetArrow;
+
     // Rigidbody
     Rigidbody2D rb;
     SpringJoint2D spring;
@@ -135,6 +138,15 @@ public class PlayerController : MonoBehaviour
 
         mainCamera.transform.position = Vector3.SmoothDamp(mainCamera.transform.position, cameraTargetPos, ref refref, 0.4f);
         mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, cameraTargetSize, 0.03f);
+
+        // Arrow to planet target direction
+        Vector3 arrowDirection = (gameManager.TargetPlanet.transform.position - pos).normalized;
+        
+        targetArrow.transform.eulerAngles = arrowDirection;
+
+        // Set rotation around planet of ship
+        float arrowRotationAngle = Mathf.Atan2(arrowDirection.y, arrowDirection.x) - Mathf.PI / 2;
+        targetArrow.transform.rotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * arrowRotationAngle);
     }
 
     void OnTriggerEnter2D(Collider2D other)
