@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector2(10f, 0f);
         spring = GetComponent<SpringJoint2D>();
 
-        gameManager = mainCamera.GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         // Set camera default position
         cameraTargetPos = transform.position;
@@ -191,7 +191,7 @@ public class PlayerController : MonoBehaviour
 
 			// See if the planet is the target
 			if (other.transform.parent.name == gameManager.targetPlanet.name) {
-				Debug.Log ("WIN");
+				Debug.Log ("Hit target");
 				winRoutine = StartCoroutine(ToSuccess(3));
 			}
 

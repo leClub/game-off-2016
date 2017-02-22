@@ -23,7 +23,9 @@ public class MissionManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        gameManager = Camera.main.GetComponent<GameManager>();
+        EventManager.targetReached += Test;
+
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         timerText = GameObject.Find("Timer").GetComponent<Text>();	
 		timeInSeconds = maxTimeInSeconds;
@@ -61,4 +63,17 @@ public class MissionManager : MonoBehaviour {
 
 		timerText.text = timeRemaining;
 	}
+
+    void onEnable() {
+        Debug.Log("Enabled");
+        EventManager.targetReached += Test;
+    }
+
+    void onDisable() {
+        EventManager.targetReached -= Test;
+    }
+
+    void Test() {
+        Debug.Log("TEST?????");
+    }
 }

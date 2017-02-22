@@ -6,21 +6,31 @@ public class PlanetController : MonoBehaviour {
 
     GameManager gameManager;
 
+    public EventManager em;
+
     private bool isTarget = false;
 
     // Use this for initialization
-    void Start () {
-        gameManager = Camera.main.GetComponent<GameManager>();
+    void Start() {
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         gameObject.transform.Find("Highlight").GetComponent<Canvas>().enabled = false;
+
+        em = GameObject.Find("EventManager").GetComponent<EventManager>();
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update() {
         // Check if current planet is the target
         if (gameManager.TargetPlanet.name == gameObject.transform.name) {
             isTarget = true;
 
             gameObject.transform.Find("Highlight").GetComponent<Canvas>().enabled = true;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other) {
+        if (gameManager.TargetPlanet.name == gameObject.transform.name && other.tag == "Player") {
+            em.hitTarget();
         }
     }
 }
