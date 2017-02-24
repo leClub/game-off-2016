@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	public int Scrore {
+	public int Score {
 		get {
 			return scrore;
 		}

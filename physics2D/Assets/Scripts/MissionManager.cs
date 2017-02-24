@@ -9,10 +9,17 @@ public class MissionManager : MonoBehaviour {
 	GameManager gameManager;
 
 	// Timer
+	[System.NonSerialized]
 	public Text timerText;
 	public float maxTimeInSeconds;
 	private string timeRemaining;
 	private float timeInSeconds, minutes, seconds;
+
+	// Score
+	[System.NonSerialized]
+	public Text scoreText;
+	private int currentScore;
+	public int scoreStep = 400;
 
 	// Mission status
 	private string missionStatus;
@@ -23,13 +30,20 @@ public class MissionManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		// Start listn to target hit event
         EventManager.targetReached += Test;
 
+		// Load gamemanager
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
+		// Load timer
         timerText = GameObject.Find("Timer").GetComponent<Text>();	
 		timeInSeconds = maxTimeInSeconds;
 
+		// Load score
+		scoreText = GameObject.Find("Score").GetComponent<Text>();	
+
+		// Choose a target
         pickTarget();
 	}
 
@@ -39,6 +53,7 @@ public class MissionManager : MonoBehaviour {
 		targets = GameObject.FindGameObjectsWithTag("Planet");
 		int index = Random.Range (0, targets.Length);
 		targetPlanet = targets[index];
+
 		// Set the game manager target
 		gameManager.TargetPlanet = targetPlanet;
 	}
@@ -51,6 +66,9 @@ public class MissionManager : MonoBehaviour {
 			missionStatus = "FAIL";
 			gameManager.MissionResolution = missionStatus;
 		}
+
+
+		DisplayScore();
 	}
 
 	// Calculate and display the timer
@@ -64,16 +82,17 @@ public class MissionManager : MonoBehaviour {
 		timerText.text = timeRemaining;
 	}
 
-    void onEnable() {
-        Debug.Log("Enabled");
-        EventManager.targetReached += Test;
-    }
-
-    void onDisable() {
-        EventManager.targetReached -= Test;
-    }
+	private void DisplayScore() {
+		scoreText.text = currentScore.ToString();
+	}
 
     void Test() {
-        Debug.Log("TEST?????");
+		// Choose the next target
+		pickTarget();
+
+		// Update time and score
+		timeInSeconds += 25;
+		currentScore += scoreStep;
+		gameManager.Score = currentScore;
     }
 }

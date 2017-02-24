@@ -90,8 +90,8 @@ public class PlayerController : MonoBehaviour
         if (isAnchorable)
         {
             // Attach anchor
-            //if (Input.GetKey("space") || Input.touches.Length > 0)
-            if (Input.GetKey("space"))
+            if (Input.GetKey("space") || Input.touches.Length > 0)
+            //if (Input.GetKey("space"))
             {
                 spring.enabled = true;
                 anchored = true;
@@ -118,8 +118,8 @@ public class PlayerController : MonoBehaviour
             spring.distance = Mathf.Lerp(spring.distance, anchorDist, 0.5f);
 
             // Release anchor
-            //if (Input.GetKeyUp("space") || Input.touches.Length <= 0)
-            if (Input.GetKeyUp("space")) {
+			if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
+            //if (Input.GetKeyUp("space")) {
                 spring.enabled = false;
                 anchored = false;
             }
@@ -188,13 +188,6 @@ public class PlayerController : MonoBehaviour
             {
                 isAnchorable = true;
             }
-
-			// See if the planet is the target
-			if (other.transform.parent.name == gameManager.targetPlanet.name) {
-				Debug.Log ("Hit target");
-				winRoutine = StartCoroutine(ToSuccess(3));
-			}
-
         }
         // Collision behaviour when hit planet core
         else if (other.tag == "Planet")
@@ -223,13 +216,12 @@ public class PlayerController : MonoBehaviour
     {
         //Debug.Log( "stay" );
         // When key is hold decrease the speed
-        //if (Input.GetKeyDown("space") || Input.touches.Length > 0) {
-        if (Input.GetKeyDown("space")) {
+        if (Input.GetKeyDown("space") || Input.touches.Length > 0) {
+        //if (Input.GetKeyDown("space")) {
             isDescreasing = true;
         }
-        //if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
-        if (Input.GetKeyUp("space")) {
-            //Debug.Log("release");
+        if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
+        //if (Input.GetKeyUp("space")) {
             isDescreasing = false;
 
             // Increase speed at new orbit
@@ -250,7 +242,6 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        //Debug.Log("OnTriggerExit2D");
         if (other.tag == "Orbit")
         {
             isAnchorable = false;
