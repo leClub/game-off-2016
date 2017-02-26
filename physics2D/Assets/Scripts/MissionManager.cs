@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MissionManager : MonoBehaviour {
-
-
-	GameManager gameManager;
 
 	// Timer
 	[System.NonSerialized]
@@ -28,48 +26,48 @@ public class MissionManager : MonoBehaviour {
 	private GameObject[] targets;
 	private GameObject targetPlanet;
 
+    // Mission resolution time to appear
+    public int timeAfterMissionResolution = 3;
+
 	// Use this for initialization
 	void Start () {
 		// Start listn to target hit event
-        EventManager.targetReached += Test;
+        EventManager.hitTargetEvent += HitTarget;
+        EventManager.crashEvent += Crash;
+        EventManager.outOfLimitsEvent += OutOfLimits;
+        EventManager.outOfTimeEvent += OutOfTime;
 
-		// Load gamemanager
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-
-		// Load timer
+        // Load timer
         timerText = GameObject.Find("Timer").GetComponent<Text>();	
 		timeInSeconds = maxTimeInSeconds;
 
 		// Load score
-		scoreText = GameObject.Find("Score").GetComponent<Text>();	
+		scoreText = GameObject.Find("Score").GetComponent<Text>();
 
-		// Choose a target
-        pickTarget();
+        // Choose a target
+        PickTarget();
 	}
 
 	// Choose the target planet randomly
-	void pickTarget () {
+	void PickTarget() {
 		// Choose the planet gameobject
 		targets = GameObject.FindGameObjectsWithTag("Planet");
 		int index = Random.Range (0, targets.Length);
 		targetPlanet = targets[index];
 
 		// Set the game manager target
-		gameManager.TargetPlanet = targetPlanet;
+		GameManager.gameManager.TargetPlanet = targetPlanet;
 	}
 
 	// Update is called once per frame
 	void Update () {
 		DisplayTimer ();
+        DisplayScore();
 
-		if (timeInSeconds < 1) {
-			missionStatus = "FAIL";
-			gameManager.MissionResolution = missionStatus;
-		}
-
-
-		DisplayScore();
-	}
+        if (timeInSeconds < 1) {
+            OutOfTime();
+        }
+    }
 
 	// Calculate and display the timer
 	private void DisplayTimer () {
@@ -86,13 +84,38 @@ public class MissionManager : MonoBehaviour {
 		scoreText.text = currentScore.ToString();
 	}
 
-    void Test() {
-		// Choose the next target
-		pickTarget();
+    void HitTarget() {
+        Debug.Log("Hit target !");
+        // Choose the next target
+        PickTarget();
 
 		// Update time and score
 		timeInSeconds += 25;
 		currentScore += scoreStep;
-		gameManager.Score = currentScore;
+		GameManager.gameManager.Score = currentScore;
+    }
+
+    void Crash() {
+        Debug.Log("Crash !");
+        missionStatus = "CRASH";
+        StartCoroutine(ToGameOver(timeAfterMissionResolution));
+    }
+
+    void OutOfLimits() {
+        Debug.Log("Out of limits !");
+        missionStatus = "OUTOFLIMITS";
+        StartCoroutine(ToGameOver(timeAfterMissionResolution));
+    }
+
+    void OutOfTime() {
+        Debug.Log("Out of time !");
+        missionStatus = "OUTOFTIME";
+        StartCoroutine(ToGameOver(timeAfterMissionResolution));
+    }
+
+    IEnumerator ToGameOver(int seconds) {
+        yield return new WaitForSeconds(seconds);
+        GameManager.gameManager.MissionResolution = missionStatus;
+        SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
     }
 }

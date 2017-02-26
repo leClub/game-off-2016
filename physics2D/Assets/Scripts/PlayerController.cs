@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    // Game manager
-    public GameManager gameManager;
+    // Events manager
+    private EventManager em;
 
     // Camera
     public Camera mainCamera;
@@ -53,11 +53,11 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+                em = GameObject.Find("EventManager").GetComponent<EventManager>();
+
         rb = GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(10f, 0f);
         spring = GetComponent<SpringJoint2D>();
-
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         // Set camera default position
         cameraTargetPos = transform.position;
@@ -90,8 +90,8 @@ public class PlayerController : MonoBehaviour
         if (isAnchorable)
         {
             // Attach anchor
-            if (Input.GetKey("space") || Input.touches.Length > 0)
-            //if (Input.GetKey("space"))
+            //if (Input.GetKey("space") || Input.touches.Length > 0)
+            if (Input.GetKey("space"))
             {
                 spring.enabled = true;
                 anchored = true;
@@ -118,8 +118,8 @@ public class PlayerController : MonoBehaviour
             spring.distance = Mathf.Lerp(spring.distance, anchorDist, 0.5f);
 
             // Release anchor
-			if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
-            //if (Input.GetKeyUp("space")) {
+			//if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
+            if (Input.GetKeyUp("space")) {
                 spring.enabled = false;
                 anchored = false;
             }
@@ -140,7 +140,7 @@ public class PlayerController : MonoBehaviour
         mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, cameraTargetSize, 0.03f);
 
         // Arrow to planet target direction
-        Vector3 arrowDirection = (gameManager.TargetPlanet.transform.position - pos).normalized;
+        Vector3 arrowDirection = (GameManager.gameManager.TargetPlanet.transform.position - pos).normalized;
         
         targetArrow.transform.eulerAngles = arrowDirection;
 
@@ -198,13 +198,13 @@ public class PlayerController : MonoBehaviour
             transform.localScale = new Vector3(4f, 4f, 1f);
             Debug.Log("BADABOOM !");
 			isCrashed = true;
-            StartCoroutine(ToGameover(3));
+            em.crash();
         }
         // Collision behaviour when leaving limits
        else if (other.tag == "OuterSpace")
         {
             Debug.Log("leaving limits");
-            StartCoroutine(ToGameover(3));
+            em.outOfLimits();
         }
         // Collision behaviour when hit other objects
         else {
@@ -216,12 +216,12 @@ public class PlayerController : MonoBehaviour
     {
         //Debug.Log( "stay" );
         // When key is hold decrease the speed
-        if (Input.GetKeyDown("space") || Input.touches.Length > 0) {
-        //if (Input.GetKeyDown("space")) {
+        //if (Input.GetKeyDown("space") || Input.touches.Length > 0) {
+        if (Input.GetKeyDown("space")) {
             isDescreasing = true;
         }
-        if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
-        //if (Input.GetKeyUp("space")) {
+        //if (Input.GetKeyUp("space") || Input.touches.Length <= 0) {
+        if (Input.GetKeyUp("space")) {
             isDescreasing = false;
 
             // Increase speed at new orbit
@@ -247,17 +247,4 @@ public class PlayerController : MonoBehaviour
             isAnchorable = false;
         }
     }
-
-    IEnumerator ToGameover(int seconds)
-    {
-        yield return new WaitForSeconds(seconds);
-        gameManager.MissionResolution = "FAIL";
-    }
-
-
-	IEnumerator ToSuccess(int seconds)
-	{
-		yield return new WaitForSeconds(seconds);
-		gameManager.MissionResolution = "WIN";
-	}
 }

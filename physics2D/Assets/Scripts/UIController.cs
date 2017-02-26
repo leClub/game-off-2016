@@ -4,19 +4,9 @@ using UnityEngine.SceneManagement;
 
 public class UIController : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
     public void ToMain() {
         Debug.Log("Start !");
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        SceneManager.LoadScene("TourMission", LoadSceneMode.Single);
     }
 
     public void ToHome() {
@@ -25,6 +15,7 @@ public class UIController : MonoBehaviour {
     }
 
     public void QuitGame() {
+        Debug.Log("Quit");
         Application.Quit();
     }
 }
