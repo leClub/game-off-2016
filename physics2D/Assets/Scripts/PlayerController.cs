@@ -53,14 +53,14 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-                em = GameObject.Find("EventManager").GetComponent<EventManager>();
+        em = GameObject.Find("EventManager").GetComponent<EventManager>();
 
         rb = GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(10f, 0f);
         spring = GetComponent<SpringJoint2D>();
 
         // Set camera default position
-        cameraTargetPos = transform.position;
+        cameraTargetPos = new Vector3(transform.position.x, transform.position.y, -115f);
         cameraTargetSize = 50f;
 
         anim = GetComponent<Animator>();
@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
                 anchorDist = Vector3.Distance(anchor, pos);
 
                 // Set camera target position to planet
-                cameraTargetPos = new Vector3(anchor.x, anchor.y, -10f);
+                cameraTargetPos = new Vector3(anchor.x, anchor.y, -115f);
                 cameraTargetSize = 12f * anchorDist / 10;
             }
 
@@ -127,7 +127,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             // Set camera target position to the ship
-            cameraTargetPos = new Vector3(pos.x, pos.y, -10f) + new Vector3(rb.velocity.x / 2, rb.velocity.y / 2, 0f);
+            cameraTargetPos = new Vector3(pos.x, pos.y, -10f) + new Vector3(rb.velocity.x / 2, rb.velocity.y / 2, -115f);
             cameraTargetSize = 20f;
         }
 

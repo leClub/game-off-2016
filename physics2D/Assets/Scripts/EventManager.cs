@@ -13,8 +13,8 @@ public class EventManager : MonoBehaviour {
     }
 
     // When player crashes the space ship
-    public delegate void CarshAction();
-    public static event CarshAction crashEvent;
+    public delegate void CrashAction();
+    public static event CrashAction crashEvent;
 
     public void crash() {
         if (crashEvent != null)
